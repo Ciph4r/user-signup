@@ -49,11 +49,11 @@ router.post('/', (req, res, next) => {
       } = req.body
       // const salt = bcrypt.genSaltSync(10)
       // const hash = bcrypt.hashSync(req.body.password, salt)
-
+      const random = nanoid.nanoid(10)
       newUser.name = name
       newUser.username = username
       newUser.email = email
-      newUser.password = nanoid.nanoid(10)
+      newUser.password = random
       newUser.address.number = number
       newUser.address.city = city
       newUser.address.state = state
@@ -78,8 +78,8 @@ router.post('/', (req, res, next) => {
             }],
             "Subject": "Greetings from Random APP.",
             "TextPart": "",
-            "HTMLPart": `<h3>Dear ${name}, welcome to <a href='http://localhost:3000/'>RANDOM APP</a>!</h3><br />Click on the provided link to complete setup`,
-            "CustomID": "AppGettingStartedTest"
+            "HTMLPart": `<h3>Dear ${name}, welcome to <a href='http://localhost:3000/update/${random}'>RANDOM APP</a>!</h3><br />Click on the provided link to complete setup`,
+            "CustomID": ""
           }]
         })
       request
@@ -93,6 +93,12 @@ router.post('/', (req, res, next) => {
       /////////////
 
     }
+  })
+
+  router.get('/update/:password' , (req,res) => {
+    User.findOne({password : req.params.password}).then((user) => {
+      res.render('update')
+    })
   })
 
 })
