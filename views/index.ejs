@@ -18,16 +18,30 @@
 
 
 
+      <div id='login'>
+        <form class="" form action="/login" method="POST">
+          <br>
+            <input class="" type="text" id="username" name="username">
+            
+          <div class="" data-validate="Enter password">
+            <input class="" type="password" id="password" name="password">
+          </div>
+    
+          <div class="">
+              <button class="" type="submit">
+                Login
+              </button>
+          </div>
+        </form>
+        </div>
+
+
+
     <div id='register'>
       <form class="" form action="/" method="POST">
         <span class="">
           Register
         </span>
-                  <div>
-                      <% if (errors.length > 0 ) { %>
-                          <%= errors %> 
-                         <% } %>
-                  </div>
 
          <div class="">
           <h2>name</h2>
@@ -38,7 +52,6 @@
           <input class="" type="text" id="username" name="username"/>
         </div>
 
-        
         <div >
           <h2>email</h2>
           <input class="" type="text" id="email" name="email">

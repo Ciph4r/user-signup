@@ -1,1 +1,44 @@
-sdfsfsdfsdfsdf
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <div >
+            <% if (errors.length > 0 ) { %>
+              <%= errors %> 
+               <% } %>
+               <% if (success.length > 0 ) { %>
+                <%= success %> 
+                 <% } %>
+          </div>
+    
+        <div id='change-password'>
+            <form class="" form action="/update/complete?_method=PUT" method="POST">
+                <h3>username</h3>
+                <input class="" type="text" id="username" name="username" placeholder="username">
+                <h3>temp password</h3>
+                <input class="" type="text" id="temp" name="temp" placeholder="temp password">
+              <div class="" data-validate="Enter password">
+                <h3>new password</h3>
+                <input class="" type="password" id="password" name="password" placeholder="new password">
+                <input class="" type="password" id="password2" name="password2" placeholder="retype password">
+              </div>
+              <div class="">
+                  <button class="" type="submit">
+                   Change PassWord
+                  </button>
+              </div>
+            </form>
+            </div>
+        <script src="" async defer></script>
+    </body>
+</html>

@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const nanoid = require('nanoid')
 const User = require('../routes/models/User')
+const bcrypt = require('bcryptjs');
 const mailjet = require ('node-mailjet')
 .connect('d0e1a602474f855c9997b1ca1440a645', '8ae0f7c34d446d5c89f18875d1688673')
 require('dotenv').config()
@@ -78,7 +79,7 @@ router.post('/', (req, res, next) => {
             }],
             "Subject": "Greetings from Random APP.",
             "TextPart": "",
-            "HTMLPart": `<h3>Dear ${name}, welcome to <a href='http://localhost:3000/update/${random}'>RANDOM APP</a>!</h3><br />Click on the provided link to complete setup`,
+            "HTMLPart": `<h3>Dear ${name}, welcome to <a href='http://localhost:3000/update/${username}'>RANDOM APP</a>!</h3><br />Click on the provided link to complete setup and your temp password is ${random}`,
             "CustomID": ""
           }]
         })
@@ -91,16 +92,71 @@ router.post('/', (req, res, next) => {
           console.log(err.statusCode)
         })
       /////////////
-
     }
   })
 
-  router.get('/update/:password' , (req,res) => {
-    User.findOne({password : req.params.password}).then((user) => {
-      res.render('update')
+})
+
+
+router.get('/update/:username' , (req,res) => {
+  User.findOne({username : req.params.username}).then((user) => {
+    if(user.access){
+      req.flash('errors', 'this page doesnt exist, u already changed your temp password');
+      return res.render('error')
+      
+    }
+    return res.render('update')
+  })
+})
+
+
+router.put('/update/complete' , (req,res,next) => {
+  User.findOne({username: req.body.username}).then((user)=> {
+    if(!user){
+        req.flash('errors', 'user doesnt exist');
+      // return res.redirect(301, `/update/complete`)
+      return res.redirect('back')
+    }
+    if(user.password !== req.body.temp){
+        req.flash('errors', 'invalid temp password');
+        return res.redirect('back')
+    }
+    if(req.body.password !== req.body.password2){
+       req.flash('errors', 'new password doesnt match');
+      return res.redirect('back')
+    }
+    const salt = bcrypt.genSaltSync(10)
+    const hash = bcrypt.hashSync(req.body.password, salt)
+    user.password = hash
+    user.access = true
+    user.save().then(user => {
+        passport.authenticate('local-login', function(err, username, info) {
+          if (err) { return next(err); }
+          req.logIn(username, function(err) {
+            if (err) { return next(err) }
+            return res.redirect('/home')
+          });
+        })(req, res, next)
     })
   })
-
 })
+
+  router.get('/home' , auth, (req,res,next) =>{
+    res.render('home')
+
+  })
+
+  router.get('/logout' , (req,res,next)=> {
+    req.logout();
+    req.flash('success', 'You are now logged out');
+    return res.redirect('/')
+  })
+
+router.post('/login',
+passport.authenticate('local-login', {
+  successRedirect: '/home',
+  failureRedirect: '/',
+  failureFlash: true
+}))
 
 module.exports = router;
