@@ -26,13 +26,13 @@ router.get('/', function (req, res, next) {
   res.render('index');
 });
 
-
-
-
-
-
-
 router.post('/', (req, res, next) => {
+  User.findOne({username: req.body.username}).then((user)=> {
+    if (user) {
+      req.flash('errors', 'User Name is Taken')
+      return res.redirect(301, '/')
+    }
+  })
   User.findOne({
     email: req.body.email
   }).then((user) => {
@@ -60,40 +60,46 @@ router.post('/', (req, res, next) => {
       newUser.address.city = city
       newUser.address.state = state
 
-      ///////////
-      const request = mailjet
-        .post("send", {
-          'version': 'v3.1'
-        })
-        .request({
-          "Messages": [{
-            "From": {
-              "Email": "david.lau@codeimmersives.com",
-              "Name": "Dave"
-            },
-            "To": [{
-              "Email": email,
-              "Name": name
-            }],
-            "Subject": "Greetings from Random APP.",
-            "TextPart": "",
-            "HTMLPart": `<h3>Dear ${name}, welcome to <a href='http://localhost:3000/update/${username}'>RANDOM APP</a>!</h3><br />Click on the provided link to complete setup and your temp password is ${random}`,
-            "CustomID": ""
-          }]
-        })
-      request
-        .then((result) => {
-          newUser
+      newUser
             .save()
-            .catch((err) => console.log('Error here'))
-          req.flash('success', 'THANK YOU FOR REGISTERING , CHECK YOUR EMAIL');
-          return res.redirect(301, '/')
-        })
-        .catch((err) => {
-          req.flash('errors', 'failed to register');
-          return res.redirect(301, '/')
-          console.log(err.statusCode)
-        })
+            .then((user) => {
+              const request = mailjet
+              .post("send", {
+                'version': 'v3.1'
+              })
+              .request({
+                "Messages": [{
+                  "From": {
+                    "Email": "david.lau@codeimmersives.com",
+                    "Name": "Dave"
+                  },
+                  "To": [{
+                    "Email": email,
+                    "Name": name
+                  }],
+                  "Subject": "Greetings from Random APP.",
+                  "TextPart": "",
+                  "HTMLPart": `<h3>Dear ${name}, welcome to <a href='http://localhost:3000/update/${username}'>RANDOM APP</a>!</h3><br />Click on the provided link to complete setup and your temp password is ${random}`,
+                  "CustomID": ""
+                }]
+              })
+            request
+              .then((result) => {
+                req.flash('success', 'THANK YOU FOR REGISTERING , CHECK YOUR EMAIL');
+                return res.redirect(301, '/')
+              })
+              .catch((err) => {
+                req.flash('errors', 'failed to register');
+                return res.redirect(301, '/')
+                console.log(err.statusCode)
+              })
+            })
+            .catch((err) => {
+              console.log(err)
+              req.flash('errors', 'MY SERVER DB ERROR');
+              return res.redirect(301, '/')
+            })
+      ///////////
     }
   })
 })
