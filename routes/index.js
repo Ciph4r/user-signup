@@ -5,7 +5,7 @@ const nanoid = require('nanoid')
 const User = require('../routes/models/User')
 const bcrypt = require('bcryptjs');
 const mailjet = require ('node-mailjet')
-.connect('d0e1a602474f855c9997b1ca1440a645', '8ae0f7c34d446d5c89f18875d1688673')
+.connect(process.env.MAILKEY , process.env.MAILSECRET)
 require('dotenv').config()
 
 
